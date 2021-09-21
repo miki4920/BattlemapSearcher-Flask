@@ -8,11 +8,10 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////tmp/test.db'
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 db = SQLAlchemy(app)
 
-
 tags = db.Table('tags',
-    db.Column('tag_id', db.Integer, db.ForeignKey('tag.id'), primary_key=True),
-    db.Column('map_id', db.Integer, db.ForeignKey('map.id'), primary_key=True)
-)
+                db.Column('tag_id', db.Integer, db.ForeignKey('tag.id'), primary_key=True),
+                db.Column('map_id', db.Integer, db.ForeignKey('map.id'), primary_key=True)
+                )
 
 
 class Tag(db.Model):
@@ -24,7 +23,7 @@ class Map(db.Model):
     name = db.Column(db.String(CONFIG.MAXIMUM_NAME_LENGTH))
     extension = db.Column(db.String(3))
     hash = db.Column(db.String(16))
-    path = db.Column(db.String(CONFIG.MAXIMUM_NAME_LENGTH*2))
+    path = db.Column(db.String(CONFIG.MAXIMUM_NAME_LENGTH * 2))
     width = db.Column(db.INTEGER)
     height = db.Column(db.INTEGER)
     square_width = db.Column(db.INTEGER, nullable=True)
@@ -38,7 +37,7 @@ def get_default(value, default):
     return value if value else default
 
 
-@app.route("/")
+@app.get("/")
 def main():
     tags = get_default(request.args.get("tags"), "")
     page = get_default(request.args.get("page"), "1")
@@ -49,3 +48,10 @@ if __name__ == '__main__':
     app.run()
     app.add_url_rule("/favicon.ico",
                      redirect_to=url_for("static", filename="icons/favicon.ico"))
+
+
+@app.post("/maps")
+def post_maps():
+    file = request.files["picture"]
+    file.save(CONFIG.UPLOAD_DIRECTORY + "/" + file.filename)
+    file.close()
