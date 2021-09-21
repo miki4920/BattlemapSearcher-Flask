@@ -5,6 +5,7 @@ from config import CONFIG
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////tmp/test.db'
+app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 db = SQLAlchemy(app)
 
 
@@ -15,22 +16,21 @@ tags = db.Table('tags',
 
 
 class Tag(db.Model):
-    id = db.column(db.String(CONFIG.MAXIMUM_NAME_LENGTH), primary_key=True)
-
+    id = db.Column(db.String(CONFIG.MAXIMUM_NAME_LENGTH), primary_key=True)
 
 
 class Map(db.Model):
-    id = db.column(db.INTEGER, primary_key=True)
-    name = db.column(db.String(CONFIG.MAXIMUM_NAME_LENGTH))
-    extension = db.column(db.String(3))
-    hash = db.column(db.String(16))
-    path = db.column(db.String(CONFIG.MAXIMUM_NAME_LENGTH*2))
-    width = db.column(db.INTEGER)
-    height = db.column(db.INTEGER)
-    square_width = db.column(db.INTEGER, nullable=True)
-    square_height = db.column(db.INTEGER, nullable=True)
-    uploader = db.column(db.String(CONFIG.MAXIMUM_NAME_LENGTH))
-    tags = db.relationship("Tag", secondary=tags, lazy="subquery",
+    id = db.Column(db.INTEGER, primary_key=True)
+    name = db.Column(db.String(CONFIG.MAXIMUM_NAME_LENGTH))
+    extension = db.Column(db.String(3))
+    hash = db.Column(db.String(16))
+    path = db.Column(db.String(CONFIG.MAXIMUM_NAME_LENGTH*2))
+    width = db.Column(db.INTEGER)
+    height = db.Column(db.INTEGER)
+    square_width = db.Column(db.INTEGER, nullable=True)
+    square_height = db.Column(db.INTEGER, nullable=True)
+    uploader = db.Column(db.String(CONFIG.MAXIMUM_NAME_LENGTH))
+    tags = db.relationship("Tag", secondary=tags,
                            backref=db.backref("maps"))
 
 
