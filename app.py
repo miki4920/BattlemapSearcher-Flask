@@ -1,14 +1,16 @@
-from flask import Flask, render_template, url_for, request
+from flask import Flask, render_template, url_for, request, make_response
 from flask_sqlalchemy import SQLAlchemy
 
 from config import CONFIG
+from errors import ValidationError
+from validation import validate_battlemap
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////tmp/test.db'
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 db = SQLAlchemy(app)
 
-tags = db.Table('tags',
+tags_table = db.Table('tags',
                 db.Column('tag_id', db.Integer, db.ForeignKey('tag.id'), primary_key=True),
                 db.Column('map_id', db.Integer, db.ForeignKey('map.id'), primary_key=True)
                 )
@@ -29,7 +31,7 @@ class Map(db.Model):
     square_width = db.Column(db.INTEGER, nullable=True)
     square_height = db.Column(db.INTEGER, nullable=True)
     uploader = db.Column(db.String(CONFIG.MAXIMUM_NAME_LENGTH))
-    tags = db.relationship("Tag", secondary=tags,
+    tags = db.relationship("Tag", secondary=tags_table,
                            backref=db.backref("maps"))
 
 
@@ -52,6 +54,12 @@ if __name__ == '__main__':
 
 @app.post("/maps")
 def post_maps():
-    file = request.files["picture"]
-    file.save(CONFIG.UPLOAD_DIRECTORY + "/" + file.filename)
-    file.close()
+    data = request.form
+    file = request.files["image"]
+    try:
+        validate_battlemap(data)
+        return "Valid", 200
+    except ValidationError as e:
+        return e.message, e.error_code
+    except Exception as e:
+        raise e
