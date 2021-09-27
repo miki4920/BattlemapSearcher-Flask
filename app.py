@@ -1,7 +1,6 @@
 import os
 import io
 
-from collections import Counter
 from flask import Flask, render_template, url_for, request
 from flask_sqlalchemy import SQLAlchemy
 from PIL import Image
@@ -46,6 +45,16 @@ def get_default(value, default):
     return value if value else default
 
 
+def get_matching(maps, tags):
+    map_dictionary = {}
+    for battlemap in maps:
+        if map_dictionary.get(battlemap) is None:
+            map_dictionary[battlemap] = 0
+        map_dictionary[battlemap] += 1
+    maps = [battlemap for battlemap in map_dictionary if map_dictionary[battlemap] > len(tags)-1]
+    return maps
+
+
 @app.get("/")
 def main():
     tags = get_default(request.args.get("tags"), "")
@@ -57,8 +66,7 @@ def main():
             tag = Tag.query.filter_by(id=tag).first()
             if tag is not None:
                 maps.extend(tag.maps)
-        maps = Counter(maps)
-        maps = [battlemap for battlemap in maps if maps[battlemap] > 1][(page-1)*CONFIG.MAPS_PER_PAGE:page*CONFIG.MAPS_PER_PAGE]
+        maps = get_matching(maps, tags)
     return render_template("main.html")
 
 
