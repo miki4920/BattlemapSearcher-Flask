@@ -1,6 +1,7 @@
 import os
 import io
 
+from collections import Counter
 from flask import Flask, render_template, url_for, request
 from flask_sqlalchemy import SQLAlchemy
 from PIL import Image
@@ -16,11 +17,10 @@ app.config[
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 db = SQLAlchemy(app)
 
-tags_table = db.Table('tags',
-                      db.Column('tag_id', db.String(CONFIG.MAXIMUM_NAME_LENGTH), db.ForeignKey('tag.id'),
-                                primary_key=True),
-                      db.Column('map_id', db.Integer, db.ForeignKey('map.id'), primary_key=True)
-                      )
+tags_table = db.Table('tags', db.Column('tag_id', db.String(CONFIG.MAXIMUM_NAME_LENGTH),
+                      db.ForeignKey('tag.id'), primary_key=True),
+                      db.Column('map_id', db.Integer,
+                      db.ForeignKey('map.id'), primary_key=True))
 
 
 class Tag(db.Model):
@@ -50,6 +50,15 @@ def get_default(value, default):
 def main():
     tags = get_default(request.args.get("tags"), "")
     page = get_default(request.args.get("page"), "1")
+    if tags:
+        maps = []
+        tags = tags.split(" ")
+        for tag in tags:
+            tag = Tag.query.filter_by(id=tag).first()
+            if tag is not None:
+                maps.extend(tag.maps)
+        maps = Counter(maps)
+        maps = [battlemap for battlemap in maps if maps[battlemap] > 1][(page-1)*CONFIG.MAPS_PER_PAGE:page*CONFIG.MAPS_PER_PAGE]
     return render_template("main.html")
 
 
