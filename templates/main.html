@@ -15,7 +15,9 @@
     </nav>
     <main>
         <article>
-
+            {% for map in maps %}
+                <img src="{{map.thumbnail_path}}" alt="{{ map.name }}">
+            {% endfor %}
         </article>
     </main>
     <footer>

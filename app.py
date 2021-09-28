@@ -1,7 +1,7 @@
 import os
 import io
 
-from flask import Flask, render_template, url_for, request
+from flask import Flask, render_template, url_for, request, send_from_directory
 from flask_sqlalchemy import SQLAlchemy
 from PIL import Image
 
@@ -10,7 +10,7 @@ from errors import ValidationError
 from getting import *
 from validation import validate_battlemap
 
-app = Flask(__name__)
+app = Flask(__name__, static_url_path="/" + CONFIG.STATIC_DIRECTORY, static_folder=CONFIG.STATIC_DIRECTORY)
 app.config[
     'SQLALCHEMY_DATABASE_URI'] = f'mysql://{os.getenv("USERNAME")}:{os.getenv("PASSWORD")}@{os.getenv("IP")}/flask'
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
@@ -67,18 +67,26 @@ def main():
             if tag is not None:
                 maps.extend(tag.maps)
         maps = get_matching(maps, tags)
-    return render_template("main.html")
+    else:
+        maps = Map.query.limit(CONFIG.MAPS_PER_PAGE).all()
+    return render_template("main.html", static=CONFIG.STATIC_DIRECTORY.strip("/"), maps=maps)
+
+
+@app.get("/<filename>/download")
+def get_map_image(filename):
+    return send_from_directory(CONFIG.UPLOAD_DIRECTORY, path=filename, as_attachment=True)
 
 
 def save_file(data, file):
     path = get_path(data)
-    stream = io.BytesIO(file.stream.read())
-    file.save(path)
-
     thumbnail_path = get_thumbnail_path(data)
+    stream = file.stream.read()
     extension = get_extension(data).upper()
 
-    with Image.open(stream) as thumbnail:
+    with open(path, "wb") as file:
+        file.write(stream)
+
+    with Image.open(io.BytesIO(stream)) as thumbnail:
         thumbnail = thumbnail.resize((CONFIG.THUMBNAIL_SIZE, CONFIG.THUMBNAIL_SIZE), Image.ANTIALIAS)
         thumbnail.save(thumbnail_path, "JPEG" if extension == "JPG" else extension)
 
