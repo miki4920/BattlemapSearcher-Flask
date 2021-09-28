@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <title>Battlemap Searcher</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='main.css') }}">
-    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}"/>
+    <link rel="stylesheet" href="{{ url_for("static", filename='main.css') }}">
+    <link rel="icon" type="image/x-icon" href="{{ url_for("static", filename='favicon.ico') }}"/>
 </head>
 <body>
     <nav>
@@ -16,21 +16,28 @@
     </nav>
     <main>
         {% for map in maps %}
-            <article>
+            <article id="{{ map.id }}">
                 <a href="{{ map.path }}">
                     <img src="{{map.thumbnail_path}}" alt="{{ map.name }}">
                 </a>
                 <menu>
                     <li>
-                        <a href="{{ map.name + "." + map.extension }}">Download</a>
+                        <form action="{{ url_for(".get_map_image", map_id = map.id) }}">
+                            <button type="submit">Download</button>
+                        </form>
+                    </li>
+                    <li>
+                        <button type="button" onclick="get_map('{{ url_for(".get_map", map_id=map.id) }}', '{{ map.id }}')"></button>
+                    </li>
+                    <li>
+                        <button type="button" onclick="delete_map('{{ url_for(".delete_map", map_id=map.id) }}', '{{ map.id }}')">Delete</button>
                     </li>
                 </menu>
             </article>
         {% endfor %}
-
     </main>
     <footer>
-
     </footer>
+    <script src="{{ url_for("static", filename="rest.js") }}"></script>
 </body>
 </html>
