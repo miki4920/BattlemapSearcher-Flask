@@ -1,7 +1,7 @@
 import os
 import io
 
-from flask import Flask, render_template, url_for, request, send_from_directory
+from flask import Flask, render_template, url_for, request, send_from_directory, abort
 from flask_sqlalchemy import SQLAlchemy
 from PIL import Image
 
@@ -69,12 +69,33 @@ def main():
         maps = get_matching(maps, tags)
     else:
         maps = Map.query.limit(CONFIG.MAPS_PER_PAGE).all()
-    return render_template("main.html", static=CONFIG.STATIC_DIRECTORY.strip("/"), maps=maps)
+    return render_template("main.html", maps=maps)
 
 
-@app.get("/<filename>/download")
-def get_map_image(filename):
-    return send_from_directory(CONFIG.UPLOAD_DIRECTORY, path=filename, as_attachment=True)
+@app.get("/maps")
+def get_maps():
+    maps = Map.query.all()
+    return render_template("get.html", maps=maps)
+
+
+@app.get("/maps/<map_id>")
+def get_map(map_id):
+    battlemap = Map.query.filter_by(id=map_id).first()
+    if battlemap is None:
+        return abort(404)
+    battlemap = battlemap.__dict__
+    del battlemap["_sa_instance_state"]
+    battlemap["path"] = url_for(".get_map_image", map_id=battlemap["id"])
+    return battlemap
+
+
+@app.get("/maps/<map_id>/download")
+def get_map_image(map_id):
+    battlemap = Map.query.filter_by(id=map_id).first()
+    if battlemap is None:
+        return abort(404)
+    path = battlemap.name + "." + battlemap.extension
+    return send_from_directory(CONFIG.UPLOAD_DIRECTORY, path=path, as_attachment=True)
 
 
 def save_file(data, file):
@@ -105,7 +126,7 @@ def create_map(data):
 
 
 @app.post("/maps")
-def post_maps():
+def post_map():
     data = request.form
     file = request.files["image"]
     try:
@@ -125,6 +146,16 @@ def post_maps():
         return e.message, e.error_code
     except Exception as e:
         raise e
+
+
+@app.route("/maps/<map_id>", methods=["DELETE"])
+def delete_map(map_id):
+    battlemap = Map.query.filter_by(id=map_id).first()
+    if battlemap:
+        db.session.delete(battlemap)
+        db.session.commit()
+        return "Valid", 200
+    abort(404)
 
 
 if __name__ == "__main__":
