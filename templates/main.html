@@ -20,6 +20,11 @@
                 <a href="{{ map.path }}">
                     <img src="{{map.thumbnail_path}}" alt="{{ map.name }}">
                 </a>
+                <menu>
+                    <li>
+                        <a href="{{ map.name + "." + map.extension }}">Download</a>
+                    </li>
+                </menu>
             </article>
         {% endfor %}
 

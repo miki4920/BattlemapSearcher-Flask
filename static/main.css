@@ -1,5 +1,6 @@
 * {
     box-sizing: border-box;
+    margin: 0;
 }
 
 body {
@@ -7,7 +8,6 @@ body {
     flex-direction: column;
     justify-content: center;
     background-color: rgb(18, 18, 18);
-    margin: 0;
 }
 
 main {
@@ -18,12 +18,28 @@ main {
 
 article {
     display: flex;
+    flex-direction: column;
     background-color: rgba(255, 255, 255, 0.09);
     width: 20%;
     flex-grow: 1;
     flex-basis: auto;
     margin: 4px;
     padding: 8px;
+}
+
+menu {
+    display: flex;
+    padding: 0;
+}
+
+li {
+    display: flex;
+    flex-grow: 1;
+    list-style-type: none;
+}
+
+.map_button {
+    width: 100%;
 }
 
 img {
