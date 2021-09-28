@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Battlemap Searcher</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='main.css') }}">
     <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}"/>
 </head>
 <body>
@@ -14,11 +15,14 @@
         </form>
     </nav>
     <main>
-        <article>
-            {% for map in maps %}
-                <img src="{{map.thumbnail_path}}" alt="{{ map.name }}">
-            {% endfor %}
-        </article>
+        {% for map in maps %}
+            <article>
+                <a href="{{ map.path }}">
+                    <img src="{{map.thumbnail_path}}" alt="{{ map.name }}">
+                </a>
+            </article>
+        {% endfor %}
+
     </main>
     <footer>
 
