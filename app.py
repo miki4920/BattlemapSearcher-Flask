@@ -85,7 +85,6 @@ def get_map(map_id):
         return abort(404)
     battlemap = battlemap.__dict__
     del battlemap["_sa_instance_state"]
-    battlemap["path"] = url_for(".get_map_image", map_id=battlemap["id"])
     return battlemap
 
 
