@@ -25,6 +25,9 @@ tags_table = db.Table('tags', db.Column('tag_id', db.String(CONFIG.MAXIMUM_NAME_
 class Tag(db.Model):
     id = db.Column(db.String(CONFIG.MAXIMUM_NAME_LENGTH), primary_key=True)
 
+    def __str__(self):
+        return self.id
+
 
 class Map(db.Model):
     id = db.Column(db.INTEGER, primary_key=True)
@@ -58,7 +61,9 @@ def get_matching(maps, tags):
 @app.get("/")
 def main():
     tags = get_default(request.args.get("tags"), "")
+    page_tags = tags
     page = get_default(request.args.get("page"), "1")
+    page = int(page) if page.isnumeric() else 1
     if tags:
         maps = []
         tags = tags.split(" ")
@@ -69,7 +74,7 @@ def main():
         maps = get_matching(maps, tags)
     else:
         maps = Map.query.limit(CONFIG.MAPS_PER_PAGE).all()
-    return render_template("main.html", maps=maps)
+    return render_template("main.html", maps=maps, tags=page_tags, back=page-1, next=page+1)
 
 
 @app.get("/maps")
