@@ -11,6 +11,14 @@ body {
     background-color: rgb(18, 18, 18);
 }
 
+nav {
+    display:flex;
+}
+
+label {
+    display: none
+}
+
 main {
     display: flex;
     width: 100%;

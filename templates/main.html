@@ -7,9 +7,8 @@
     <link rel="icon" type="image/x-icon" href="{{ url_for("static", filename='favicon.ico') }}"/>
 </head>
 <body>
-
     <nav>
-        <form method="get" action="/">>
+        <form method="get" action="/">
             <label for="tags">Tags: </label>
             <input type="text" id="tags" name="tags" value="{{ tags }}">
             <button type="submit">Search</button>
