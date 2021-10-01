@@ -1,7 +1,8 @@
 import os
 import io
+import re
 
-from flask import Flask, render_template, url_for, request, send_from_directory, abort
+from flask import Flask, render_template, url_for, request, send_from_directory
 from flask_sqlalchemy import SQLAlchemy
 from PIL import Image
 
@@ -58,22 +59,49 @@ def get_matching(maps, tags):
     return maps
 
 
+def query_maps_by_name(tags):
+    tags = [Map.name.contains(tag) for tag in tags]
+    maps = Map.query.filter(*tags)
+    return maps if maps is not None else []
+
+
+def query_maps_by_tags(tags):
+    tags = ",".join(tags)
+    maps = Map.query.from_statement(db.text(f"""SELECT map_id FROM 
+    (SELECT map_id, GROUP_CONCAT(tag_id ORDER BY tag_id) 
+    AS tag_id FROM tags GROUP BY map_id) as t where tag_id LIKE \"%%{tags}%%\" """)).all()
+    return maps if maps else []
+
+
+def query_maps(tags):
+    maps = []
+    maps.extend(query_maps_by_name(tags))
+    maps.extend(query_maps_by_tags(tags))
+    maps = list(dict.fromkeys(maps))
+    return maps
+
+
+def process_tags(tags):
+    if not tags:
+        return ""
+    tags = tags.lower()
+    tags = re.sub("[^a-z ]", " ", tags)
+    tags = re.sub(" +", " ", tags)
+    tags = tags.strip(" ")
+    return tags.split(" ")
+
+
 @app.get("/")
 def main():
     tags = get_default(request.args.get("tags"), "")
     page_tags = tags
+    tags = process_tags(tags)
     page = get_default(request.args.get("page"), "1")
     page = int(page) if page.isnumeric() else 1
     if tags:
-        maps = []
-        tags = tags.split(" ")
-        for tag in tags:
-            tag = Tag.query.filter_by(id=tag).first()
-            if tag is not None:
-                maps.extend(tag.maps)
-        maps = get_matching(maps, tags)
+        maps = query_maps(tags)
     else:
-        maps = Map.query.limit(CONFIG.MAPS_PER_PAGE).all()
+        maps = Map.query.all()[(page-1)*CONFIG.MAPS_PER_PAGE:page*CONFIG.MAPS_PER_PAGE]
     return render_template("main.html", maps=maps, tags=page_tags, back=page-1, next=page+1)
 
 
@@ -85,9 +113,7 @@ def get_maps():
 
 @app.get("/maps/<map_id>")
 def get_map(map_id):
-    battlemap = Map.query.filter_by(id=map_id).first()
-    if battlemap is None:
-        return abort(404)
+    battlemap = Map.query.filter_by(id=map_id).first_or_404()
     battlemap = battlemap.__dict__
     del battlemap["_sa_instance_state"]
     return battlemap
@@ -95,9 +121,7 @@ def get_map(map_id):
 
 @app.get("/maps/<map_id>/download")
 def get_map_image(map_id):
-    battlemap = Map.query.filter_by(id=map_id).first()
-    if battlemap is None:
-        return abort(404)
+    battlemap = Map.query.filter_by(id=map_id).first_or_404()
     path = battlemap.name + "." + battlemap.extension
     return send_from_directory(CONFIG.UPLOAD_DIRECTORY, path=path, as_attachment=True)
 
@@ -154,12 +178,10 @@ def post_map():
 
 @app.route("/maps/<map_id>", methods=["DELETE"])
 def delete_map(map_id):
-    battlemap = Map.query.filter_by(id=map_id).first()
-    if battlemap:
-        db.session.delete(battlemap)
-        db.session.commit()
-        return "Valid", 200
-    abort(404)
+    battlemap = Map.query.filter_by(id=map_id).first_or_404()
+    db.session.delete(battlemap)
+    db.session.commit()
+    return "Valid", 200
 
 
 if __name__ == "__main__":
