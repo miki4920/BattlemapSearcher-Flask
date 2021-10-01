@@ -7,18 +7,21 @@
     <link rel="icon" type="image/x-icon" href="{{ url_for("static", filename='favicon.ico') }}"/>
 </head>
 <body>
+
     <nav>
         <form method="get" action="/">>
             <label for="tags">Tags: </label>
             <input type="text" id="tags" name="tags" value="{{ tags }}">
             <button type="submit">Search</button>
+            <button type="submit" name="page" value="{{ back }}">Previous Page</button>
+            <button type="submit" name="page" value="{{ next }}">Next Page</button>
         </form>
     </nav>
     <main>
         {% for battlemap in maps %}
             <article id="{{ battlemap.id }}">
+                <section>
                 <a href="{{ battlemap.path }}">
-                    <div id="wrapper">
                     <p title="Map Information">
                         Title: {{ battlemap.name|replace("_", " ") }}<br>
                         {% if not battlemap.square_width %}
@@ -30,7 +33,6 @@
                         {% endif %}
                         Tags: {{ battlemap.tags|join(", ") }}
                     </p>
-                    </div>
                     <img src="{{battlemap.thumbnail_path}}" alt="{{ battlemap.name }}">
                 </a>
                 <menu>
@@ -46,13 +48,10 @@
                         <button type="button" onclick="delete_map('{{ url_for(".delete_map", map_id=battlemap.id) }}', '{{ battlemap.id }}')">Delete</button>
                     </li>
                 </menu>
+                </section>
             </article>
         {% endfor %}
     </main>
-    <footer>
-        <button value="{{ back }}">Previous Page</button>
-        <button value="{{ next }}">Next Page</button>
-    </footer>
     <script src="{{ url_for("static", filename="rest.js") }}"></script>
 </body>
 </html>
