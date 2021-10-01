@@ -13,8 +13,12 @@
             <label for="tags">Tags: </label>
             <input type="text" id="tags" name="tags" value="{{ tags }}">
             <button type="submit">Search</button>
-            <button type="submit" name="page" value="{{ back }}">Previous Page</button>
-            <button type="submit" name="page" value="{{ next }}">Next Page</button>
+            {% if previous_page %}
+            <button type="submit" name="page" value="{{ previous_page }}">Previous Page</button>
+            {% endif %}
+            {% if next_page %}
+            <button type="submit" name="page" value="{{ next_page }}">Next Page</button>
+            {% endif %}
         </form>
     </nav>
     <main>

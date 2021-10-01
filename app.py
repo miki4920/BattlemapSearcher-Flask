@@ -98,11 +98,11 @@ def main():
     tags = process_tags(tags)
     page = get_default(request.args.get("page"), "1")
     page = int(page) if page.isnumeric() else 1
-    if tags:
-        maps = query_maps(tags)
-    else:
-        maps = Map.query.all()[(page-1)*CONFIG.MAPS_PER_PAGE:page*CONFIG.MAPS_PER_PAGE]
-    return render_template("main.html", maps=maps, tags=page_tags, back=page-1, next=page+1)
+    maps = query_maps(tags) if tags else Map.query.all()
+    next_page = page+1 if (page+1)*CONFIG.MAPS_PER_PAGE <= len(maps) else False
+    previous_page = page-1 if page >= 1 else False
+    maps = maps[(page-1)*CONFIG.MAPS_PER_PAGE:page*CONFIG.MAPS_PER_PAGE]
+    return render_template("main.html", maps=maps, tags=page_tags, previous_page=previous_page, next_page=next_page)
 
 
 @app.get("/maps")
