@@ -14,21 +14,25 @@ body {
 main {
     display: flex;
     width: 100%;
-    justify-content: center;
     flex-wrap: wrap;
 }
 
 article {
     display: flex;
-    flex-grow: 1;
-    flex-basis: 20%;
-    flex-direction: column;
-    background-color: rgba(255, 255, 255, 0.09);
-    margin: 4px;
-    padding: 8px;
+    flex-basis: 25%;
+
 }
 
-article:hover {
+section {
+    display: flex;
+    background-color: rgba(255, 255, 255, 0.09);
+    flex-direction: column;
+    padding: 8px;
+    margin: 2px;
+
+}
+
+section:hover {
     background-color: rgba(255, 255, 255, 0.12);
 }
 
@@ -41,7 +45,7 @@ a {
 img {
     width: 100%;
     height: 100%;
-    transform: scale(1.03)
+    transform: scale(1.03);
 }
 
 p {
@@ -75,6 +79,7 @@ button:hover {
 li {
     display: flex;
     flex-grow: 1;
+    flex-basis: 0;
     list-style-type: none;
 }
 
