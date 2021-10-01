@@ -13,10 +13,27 @@ body {
 
 nav {
     display:flex;
+    margin: 4px 2px ;
+}
+
+nav form {
+    background-color: rgba(255, 255, 255, 0.09);
 }
 
 label {
     display: none
+}
+
+input {
+    flex-basis: 100%;
+    background-color: rgba(255, 255, 255, 0.09);
+    outline: none;
+    border: none;
+    margin: 8px 0 8px 8px;
+}
+
+input:hover {
+    background-color: rgba(255, 255, 255, 0.12);
 }
 
 main {
@@ -31,7 +48,7 @@ article {
 
 }
 
-section {
+article section {
     display: flex;
     background-color: rgba(255, 255, 255, 0.09);
     flex-direction: column;
@@ -40,7 +57,7 @@ section {
 
 }
 
-section:hover {
+article section:hover {
     background-color: rgba(255, 255, 255, 0.12);
 }
 
@@ -48,6 +65,11 @@ a {
     position: relative;
     max-width: 100%;
     overflow: hidden;
+}
+
+form {
+    flex-grow: 1;
+    display: flex;
 }
 
 img {
@@ -75,6 +97,7 @@ menu {
 
 button {
     flex-grow: 1;
+    flex-basis: 0;
     background-color: rgba(255, 255, 255, 0.09);
     border: none;
     cursor: pointer;
@@ -89,11 +112,6 @@ li {
     flex-grow: 1;
     flex-basis: 0;
     list-style-type: none;
-}
-
-form {
-    display: flex;
-    flex-grow: 1;
 }
 
 
