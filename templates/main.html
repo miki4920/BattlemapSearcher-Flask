@@ -10,14 +10,16 @@
     <nav>
         <form method="get" action="/">
             <label for="tags">Tags: </label>
-            <input type="text" id="tags" name="tags" value="{{ tags }}">
-            <button type="submit">Search</button>
-            {% if previous_page %}
-            <button type="submit" name="page" value="{{ previous_page }}">Previous Page</button>
-            {% endif %}
-            {% if next_page %}
-            <button type="submit" name="page" value="{{ next_page }}">Next Page</button>
-            {% endif %}
+            <input type="text" id="tags" name="tags" value="{{ tags }}" autocomplete="off">
+            <section class="nav_buttons">
+                <button type="submit">Search</button>
+                {% if previous_page %}
+                <button  type="submit" name="page" value="{{ previous_page }}">Previous</button>
+                {% endif %}
+                {% if next_page %}
+                <button type="submit" name="page" value="{{ next_page }}">Next</button>
+                {% endif %}
+            </section>
         </form>
     </nav>
     <main>
