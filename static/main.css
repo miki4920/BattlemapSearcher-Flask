@@ -13,7 +13,20 @@ body {
 
 nav {
     display:flex;
-    margin: 4px 2px ;
+    margin: 0 4px;
+    width: 100%;
+    position: fixed;
+    top: 0;
+    z-index: 100;
+    background-color: rgb(18, 18, 18);
+}
+
+nav:hover {
+    background-color: rgb(31, 31, 31)
+}
+
+nav:focus-within {
+    background-color: rgb(44, 44, 44);
 }
 
 nav form {
@@ -36,11 +49,11 @@ input {
 }
 
 input:hover {
-    background-color: rgba(255, 255, 255, 0.12);
+    background-color: rgba(255, 255, 255, 0.09);
 }
 
 input:focus {
-    background-color: rgba(255, 255, 255, 0.16);
+    background-color: rgba(255, 255, 255, 0.12);
 }
 
 .nav_buttons {
@@ -53,25 +66,50 @@ main {
     display: flex;
     width: 100%;
     flex-wrap: wrap;
+    background-color: rgb(18, 18, 18);
+    margin: 3em 0 0 0;
 }
 
 article {
     display: flex;
-    flex-basis: 25%;
+}
 
+@media screen and (min-width: 0px) {
+    article {
+        flex-basis: 100%;
+    }
+}
+
+@media screen and (min-width: 721px) {
+    article {
+        flex-basis: 50%;
+    }
+}
+
+@media screen and (min-width: 1281px) {
+    article {
+        flex-basis: 25%;
+    }
+}
+
+@media screen and (min-width: 1921px) {
+    article {
+        flex-basis: 14.28%;
+    }
 }
 
 article section {
     display: flex;
-    background-color: rgba(255, 255, 255, 0.09);
+    flex-grow: 1;
+    background-color: rgba(255, 255, 255, 0.05);
     flex-direction: column;
     padding: 8px;
-    margin: 2px;
+    margin: 4px;
 
 }
 
 article section:hover {
-    background-color: rgba(255, 255, 255, 0.12);
+    background-color: rgba(255, 255, 255, 0.09);
 }
 
 a {
@@ -99,7 +137,7 @@ p {
     flex-grow: 1;
 }
 
-article img:hover{
+article:hover img{
     filter: blur(4px) opacity(25%) brightness(0.5);
     transition-duration: 0.2s;
 }
