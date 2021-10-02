@@ -26,7 +26,7 @@ nav:hover {
 }
 
 nav:focus-within {
-    background-color: rgb(44, 44, 44);
+    background-color: rgb(31, 31, 31);
 }
 
 nav form {
