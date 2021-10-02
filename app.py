@@ -45,20 +45,6 @@ class Map(db.Model):
                            backref=db.backref("maps"))
 
 
-def get_default(value, default):
-    return value if value else default
-
-
-def get_matching(maps, tags):
-    map_dictionary = {}
-    for battlemap in maps:
-        if map_dictionary.get(battlemap) is None:
-            map_dictionary[battlemap] = 0
-        map_dictionary[battlemap] += 1
-    maps = [battlemap for battlemap in map_dictionary if map_dictionary[battlemap] > len(tags)-1]
-    return maps
-
-
 def query_maps_by_name(tags):
     tags = [Map.name.contains(tag) for tag in tags]
     maps = Map.query.filter(*tags)
@@ -93,30 +79,31 @@ def process_tags(tags):
 
 @app.get("/")
 def main():
-    tags = get_default(request.args.get("tags"), "")
-    page_tags = tags
+    tags = request.args.get("tags", "")
     tags = process_tags(tags)
-    page = get_default(request.args.get("page"), "1")
+    page = request.args.get("page", "1")
     page = int(page) if page.isnumeric() else 1
     maps = query_maps(tags) if tags else Map.query.all()
     next_page = page+1 if (page+1)*CONFIG.MAPS_PER_PAGE <= len(maps) else False
     previous_page = page-1 if page >= 1 else False
     maps = maps[(page-1)*CONFIG.MAPS_PER_PAGE:page*CONFIG.MAPS_PER_PAGE]
-    return render_template("main.html", maps=maps, tags=page_tags, previous_page=previous_page, next_page=next_page)
+    return render_template("main.html", maps=maps, tags=request.args.get("tags", ""), previous_page=previous_page, next_page=next_page)
 
 
 @app.get("/maps")
 def get_maps():
     maps = Map.query.all()
-    return render_template("get.html", maps=maps)
+    maps = ",".join([str(battlemap.id) for battlemap in maps])
+    return maps
 
 
 @app.get("/maps/<map_id>")
 def get_map(map_id):
     battlemap = Map.query.filter_by(id=map_id).first_or_404()
-    battlemap = battlemap.__dict__
-    del battlemap["_sa_instance_state"]
-    return battlemap
+    battlemap_dictionary = battlemap.__dict__
+    battlemap_dictionary["tags"] = ",".join([str(tag) for tag in battlemap.tags])
+    del battlemap_dictionary["_sa_instance_state"]
+    return battlemap_dictionary
 
 
 @app.get("/maps/<map_id>/download")
@@ -188,5 +175,3 @@ if __name__ == "__main__":
     db.create_all()
     db.session.commit()
     app.run()
-    app.add_url_rule("/favicon.ico",
-                     redirect_to=url_for("static", filename="icons/favicon.ico"))
