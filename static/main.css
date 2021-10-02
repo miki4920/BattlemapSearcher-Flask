@@ -7,30 +7,24 @@
 body {
     display: flex;
     flex-direction: column;
-    justify-content: center;
     background-color: rgb(18, 18, 18);
 }
 
 nav {
     display:flex;
-    margin: 0 4px;
+    padding: 0 12px;
     width: 100%;
     position: fixed;
-    top: 0;
     z-index: 100;
-    background-color: rgb(18, 18, 18);
+    background-color: rgb(40, 40, 40);
 }
 
 nav:hover {
-    background-color: rgb(31, 31, 31)
+    background-color: rgb(44, 44, 44)
 }
 
 nav:focus-within {
-    background-color: rgb(31, 31, 31);
-}
-
-nav form {
-    background-color: rgba(255, 255, 255, 0.09);
+    background-color: rgb(44, 44, 44);
 }
 
 label {
@@ -42,8 +36,7 @@ input {
     background-color: rgba(255, 255, 255, 0.09);
     outline: none;
     border: none;
-    margin: 8px 0 8px 8px;
-    padding: 4px;
+    margin: 8px 0;
     font-size: 1.17em;
     cursor: pointer;
 }
@@ -58,15 +51,12 @@ input:focus {
 
 .nav_buttons {
     display: flex;
-    flex-grow: 1;
-    margin: 8px 8px 8px 0;
+    margin: 8px 0;
 }
 
 main {
     display: flex;
-    width: 100%;
     flex-wrap: wrap;
-    background-color: rgb(18, 18, 18);
     margin: 3em 0 0 0;
 }
 
@@ -113,8 +103,6 @@ article section:hover {
 }
 
 a {
-    position: relative;
-    max-width: 100%;
     overflow: hidden;
 }
 
@@ -133,8 +121,6 @@ p {
     position: absolute;
     font-size: 1.17em;
     margin: 4px;
-    padding: 0;
-    flex-grow: 1;
 }
 
 article:hover img{
