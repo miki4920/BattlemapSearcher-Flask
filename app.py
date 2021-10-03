@@ -2,7 +2,7 @@ import os
 import io
 import re
 
-from flask import Flask, render_template, url_for, request, send_from_directory
+from flask import Flask, render_template, request, send_from_directory
 from flask_sqlalchemy import SQLAlchemy
 from PIL import Image
 
@@ -87,7 +87,8 @@ def main():
     next_page = page+1 if (page+1)*CONFIG.MAPS_PER_PAGE <= len(maps) else False
     previous_page = page-1 if page >= 1 else False
     maps = maps[(page-1)*CONFIG.MAPS_PER_PAGE:page*CONFIG.MAPS_PER_PAGE]
-    return render_template("main.html", maps=maps, tags=request.args.get("tags", ""), previous_page=previous_page, next_page=next_page)
+    return render_template("main.html", maps=maps, tags=request.args.get("tags", ""),
+                           previous_page=previous_page, next_page=next_page)
 
 
 @app.get("/maps")

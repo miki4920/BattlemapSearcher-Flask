@@ -7,7 +7,7 @@ function get_map(url, map_id) {
     temporary_input.select();
     document.execCommand("copy");
     document.body.removeChild(temporary_input);
-}
+}``
 
 
 function delete_map(url, map_id) {
