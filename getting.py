@@ -41,12 +41,3 @@ def get_square_dimensions(data: Dict[str, str]) -> Tuple[str, str]:
     square_width = data.get("square_width")
     square_height = data.get("square_height")
     return square_width, square_height
-
-
-def get_tags(data: Dict[str, str]) -> List[str]:
-    tags = data.get("tags")
-    if tags is not None:
-        tags = tags.split(",")
-    else:
-        tags = []
-    return tags
