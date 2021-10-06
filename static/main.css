@@ -8,14 +8,16 @@ body {
     display: flex;
     flex-direction: column;
     background-color: rgb(18, 18, 18);
+    padding: 0 4px;
 }
 
 nav {
     display:flex;
-    padding: 0 12px;
-    width: 100%;
-    position: fixed;
+    position: sticky;
+    top:0;
+    padding: 0 8px;
     z-index: 100;
+    width: 100%;
     background-color: rgb(40, 40, 40);
 }
 
@@ -57,16 +59,20 @@ input:focus {
 main {
     display: flex;
     flex-wrap: wrap;
-    margin: 3em 0 0 0;
+    margin: 4px -4px;
 }
 
 article {
     display: flex;
+    padding: 4px;
 }
 
 @media screen and (min-width: 0px) {
     article {
         flex-basis: 100%;
+    }
+    p {
+        width: 90%;
     }
 }
 
@@ -74,17 +80,26 @@ article {
     article {
         flex-basis: 50%;
     }
+    p {
+        width: 40%;
+    }
 }
 
 @media screen and (min-width: 1281px) {
     article {
         flex-basis: 25%;
     }
+    p {
+        width: 20%;
+    }
 }
 
 @media screen and (min-width: 1921px) {
     article {
         flex-basis: 14.28%;
+    }
+    p {
+        width: 10%;
     }
 }
 
@@ -94,7 +109,6 @@ article section {
     background-color: rgba(255, 255, 255, 0.05);
     flex-direction: column;
     padding: 8px;
-    margin: 4px;
 
 }
 
