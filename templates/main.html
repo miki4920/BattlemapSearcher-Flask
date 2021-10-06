@@ -47,7 +47,7 @@
                         </form>
                     </li>
                     <li>
-                        <button type="button" onclick="get_map('{{ url_for(".get_map", map_id=battlemap.id) }}', '{{ battlemap.id }}')">Foundry</button>
+                        <button type="button" onclick="get_map(this, '{{ url_for(".get_map", map_id=battlemap.id) }}')">Foundry</button>
                     </li>
                     <li>
                         <button type="button" onclick="delete_map('{{ url_for(".delete_map", map_id=battlemap.id) }}', '{{ battlemap.id }}')">Delete</button>
