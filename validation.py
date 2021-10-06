@@ -21,7 +21,7 @@ def validate_dimensions(width: str, height: str) -> bool:
 
 def validate_square_dimensions(square_width: str, square_height: str) -> bool:
     if type(square_width) == str and type(square_height) == str:
-        return bool(re.fullmatch("\d{1,3}", square_width) and re.fullmatch("\d{1,3}", square_height))
+        return bool(re.fullmatch("\d{1,3}", square_width)) and bool(re.fullmatch("\d{1,3}", square_height))
     return square_width is None and square_height is None
 
 
