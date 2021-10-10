@@ -4,10 +4,11 @@ import re
 
 from flask import Flask, render_template, request, send_from_directory
 from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy import exc
 from PIL import Image
 
 from config import CONFIG
-from errors import ValidationError
+from errors import ValidationError, HashRepeated
 from getting import *
 from validation import validate_battlemap
 
@@ -16,6 +17,7 @@ app.config[
     'SQLALCHEMY_DATABASE_URI'] = f'mysql://{os.getenv("USERNAME")}:{os.getenv("PASSWORD")}@{os.getenv("IP")}/flask'
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 db = SQLAlchemy(app)
+
 
 tags_table = db.Table('tags', db.Column('tag_id', db.String(CONFIG.MAXIMUM_NAME_LENGTH),
                       db.ForeignKey('tag.id'), primary_key=True),
@@ -34,7 +36,7 @@ class Map(db.Model):
     id = db.Column(db.INTEGER, primary_key=True)
     name = db.Column(db.String(CONFIG.MAXIMUM_NAME_LENGTH))
     extension = db.Column(db.String(3))
-    hash = db.Column(db.String(16))
+    hash = db.Column(db.String(16), unique=True)
     path = db.Column(db.String(CONFIG.MAXIMUM_NAME_LENGTH * 2))
     thumbnail_path = db.Column(db.String(CONFIG.MAXIMUM_NAME_LENGTH * 2))
     width = db.Column(db.INTEGER)
@@ -114,6 +116,10 @@ def get_map_image(map_id):
     return send_from_directory(CONFIG.UPLOAD_DIRECTORY, path=path, as_attachment=True)
 
 
+def validate_hash(map_hash):
+    return Map.query.filter_by(hash=map_hash).first() is None
+
+
 def save_file(data, file):
     path = get_path(data)
     thumbnail_path = get_thumbnail_path(data)
@@ -146,6 +152,8 @@ def post_map():
     data = request.form
     file = request.files["image"]
     try:
+        if not validate_hash(data.get("hash")):
+            raise HashRepeated(data.get("name"), data.get("hash"))
         validate_battlemap(data)
         save_file(data, file)
         battlemap = create_map(data)
@@ -172,7 +180,13 @@ def delete_map(map_id):
     return "Valid", 200
 
 
+@app.after_request
+def after_request(response):
+    response.headers.add("Access-Control-Allow-Origin", "*")
+    return response
+
+
 if __name__ == "__main__":
     db.create_all()
     db.session.commit()
-    app.run()
+    app.run(host="192.168.0.16", port=80)
