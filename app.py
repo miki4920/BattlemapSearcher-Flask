@@ -4,7 +4,6 @@ import re
 
 from flask import Flask, render_template, request, send_from_directory
 from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy import exc
 from PIL import Image
 
 from config import CONFIG
@@ -45,6 +44,10 @@ class Map(db.Model):
     square_height = db.Column(db.INTEGER, nullable=True)
     tags = db.relationship("Tag", secondary=tags_table,
                            backref=db.backref("maps"))
+
+
+class Blacklist(db.Model):
+    hash = db.Column(db.String(16), primary_key=True)
 
 
 def query_maps_by_name(tags):
@@ -117,7 +120,7 @@ def get_map_image(map_id):
 
 
 def validate_hash(map_hash):
-    return Map.query.filter_by(hash=map_hash).first() is None
+    return Map.query.filter_by(hash=map_hash).first() is None or Blacklist.query.filter_by(hash=map_hash) is not None
 
 
 def save_file(data, file):
@@ -175,6 +178,8 @@ def post_map():
 @app.route("/maps/<map_id>", methods=["DELETE"])
 def delete_map(map_id):
     battlemap = Map.query.filter_by(id=map_id).first_or_404()
+    blacklist = Blacklist(hash=battlemap.hash)
+    db.session.add(blacklist)
     db.session.delete(battlemap)
     db.session.commit()
     return "Valid", 200
@@ -189,4 +194,4 @@ def after_request(response):
 if __name__ == "__main__":
     db.create_all()
     db.session.commit()
-    app.run(host="192.168.0.16", port=80)
+    app.run()
