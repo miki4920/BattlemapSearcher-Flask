@@ -9,6 +9,7 @@ flask-sqlalchemy = "*"
 pytest = "*"
 flask-mysqldb = "*"
 pillow = "*"
+requests = "*"
 
 [dev-packages]
 
