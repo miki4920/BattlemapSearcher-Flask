@@ -29,13 +29,6 @@ class BlackListHash(db.Model):
         return self.hash
 
 
-class BlackListWord(db.Model):
-    word = db.Column(db.String(CONFIG.MAXIMUM_NAME_LENGTH), primary_key=True)
-
-    def __str__(self):
-        return self.word
-
-
 class StopWordList(db.Model):
     word = db.Column(db.String(CONFIG.MAXIMUM_NAME_LENGTH), primary_key=True)
 

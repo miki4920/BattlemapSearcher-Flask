@@ -14,11 +14,6 @@ class WebScrapper(object):
     def image_format(submission):
         return submission["url"][-3:] not in CONFIG.IMAGE_EXTENSIONS
 
-    @staticmethod
-    def blacklist_word(submission):
-        image_name = submission["title"].lower()
-        return any([BlackListWord.filter_by(word=word).first() is not None for word in image_name])
-
     def check_title(self, submission):
         url = submission["url"][-3:]
         if self.image_format(url):
