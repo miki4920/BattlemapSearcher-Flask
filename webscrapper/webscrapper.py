@@ -1,38 +1,22 @@
 import json
+import os
 import re
 
 from io import BytesIO
 from PIL import Image
 
 from config import CONFIG
+from hash import hash_image
 from model import *
 from network import get_api_url, request_file
+from submission_handler import SubmissionHandler
 
 
 class WebScrapper(object):
-    @staticmethod
-    def image_format(submission):
-        return submission["url"][-3:] not in CONFIG.IMAGE_EXTENSIONS
-
-    def check_title(self, submission):
-        url = submission["url"][-3:]
-        if self.image_format(url):
-            return False
-        if self.blacklist_word(submission):
-            return False
-        return True
-
-    @staticmethod
-    def check_file_size(submission):
-        return CONFIG.MINIMUM_IMAGE_SIZE_IN_BYTES < len(submission) < CONFIG.MAXIMUM_IMAGE_SIZE_IN_BYTES
-
-    @staticmethod
-    def blacklist_hash(submission_hash):
-        return BlackListHash.filter_by(hash=submission_hash).first() is not None
-
     def get_submission(self, submission):
-        if self.check_title(submission):
-            submission_dictionary = self.dictionary_maker(submission, submission["created_utc"])
+        if SubmissionHandler.check_url(submission):
+            name = SubmissionHandler.get_name(submission)
+
             submission = request_file(submission_dictionary["url"], timeout=1).content
             submission_dictionary["width"], submission_dictionary["height"] = Image.open(BytesIO(submission)).size
             submission_dictionary["hash"] = hash_image(submission)
@@ -47,7 +31,8 @@ class WebScrapper(object):
             while True:
                 url = get_api_url(subreddit, timestamp)
                 try:
-                    json_data = request_file(url).json()["data"]
+                    json_data = request_file(url)
+                    json_data = json_data.json()["data"]
                     if len(json_data) < 1:
                         break
                     for submission in json_data:
