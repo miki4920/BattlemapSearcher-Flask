@@ -5,7 +5,6 @@ from flask_sqlalchemy import SQLAlchemy
 from PIL import Image
 
 from config import app, CONFIG
-from getting import *
 
 db = SQLAlchemy(app)
 
