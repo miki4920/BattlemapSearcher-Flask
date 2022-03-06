@@ -1,12 +1,11 @@
-import io
 import re
 
 from flask_sqlalchemy import SQLAlchemy
-from PIL import Image
 
 from config import app, CONFIG
 
 db = SQLAlchemy(app)
+
 
 tags_table = db.Table('tags', db.Column('tag_id', db.String(CONFIG.MAXIMUM_NAME_LENGTH),
                                         db.ForeignKey('tag.id'), primary_key=True),
@@ -40,7 +39,7 @@ class Map(db.Model):
     name = db.Column(db.String(CONFIG.MAXIMUM_NAME_LENGTH))
     extension = db.Column(db.String(3))
     hash = db.Column(db.String(16), unique=True)
-    path = db.Column(db.String(CONFIG.MAXIMUM_NAME_LENGTH * 2))
+    path = db.Column(db.String(CONFIG.MAXIMUM_NAME_LENGTH * 10))
     thumbnail_path = db.Column(db.String(CONFIG.MAXIMUM_NAME_LENGTH * 2))
     width = db.Column(db.INTEGER)
     height = db.Column(db.INTEGER)
@@ -50,24 +49,10 @@ class Map(db.Model):
                            backref=db.backref("maps"))
 
 
-def save_file(data, file):
-    path = get_path(data)
-    thumbnail_path = get_thumbnail_path(data)
-    stream = file.stream.read()
-    extension = get_extension(data).upper()
-
-    with open(path, "wb") as file:
-        file.write(stream)
-
-    with Image.open(io.BytesIO(stream)) as thumbnail:
-        thumbnail = thumbnail.resize((CONFIG.THUMBNAIL_SIZE, CONFIG.THUMBNAIL_SIZE), Image.ANTIALIAS)
-        thumbnail.save(thumbnail_path, "JPEG" if extension == "JPG" else extension)
-
-
 def query_maps_by_name(tags):
     tags = [Map.name.contains(tag) for tag in tags]
     maps = Map.query.filter(*tags)
-    return maps if maps is not None else []
+    return list(maps) if maps is not None else []
 
 
 def query_maps_by_tags(tags):
@@ -75,7 +60,7 @@ def query_maps_by_tags(tags):
     maps = Map.query.from_statement(db.text(f"""SELECT map_id FROM 
     (SELECT map_id, GROUP_CONCAT(tag_id ORDER BY tag_id) 
     AS tag_id FROM tags GROUP BY map_id) as t where tag_id LIKE \"%%{tags}%%\" """)).all()
-    return maps if maps else []
+    return list(maps) if maps else []
 
 
 def query_maps(tags):
