@@ -1,12 +1,8 @@
 import json
-import os
-import re
 
 from io import BytesIO
-from PIL import Image
 
-from config import CONFIG
-from hash import hash_image
+from image import image_hash
 from model import *
 from network import get_api_url, request_file
 from submission_handler import SubmissionHandler
@@ -19,7 +15,7 @@ class WebScrapper(object):
 
             submission = request_file(submission_dictionary["url"], timeout=1).content
             submission_dictionary["width"], submission_dictionary["height"] = Image.open(BytesIO(submission)).size
-            submission_dictionary["hash"] = hash_image(submission)
+            submission_dictionary["hash"] = image_hash(submission)
             if self.check_file_size(submission) and submission_dictionary["hash"] not in self.hash_set:
                 write_file(submission_dictionary["path"], submission)
                 self.submission_list.append(submission_dictionary)
