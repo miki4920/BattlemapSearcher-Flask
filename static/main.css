@@ -35,7 +35,7 @@ label {
 
 input {
     flex-basis: 100%;
-    background-color: rgba(255, 255, 255, 0.09);
+    background-color: rgba(255, 255, 255, 0.11);
     outline: none;
     border: none;
     margin: 8px 0;
@@ -44,11 +44,11 @@ input {
 }
 
 input:hover {
-    background-color: rgba(255, 255, 255, 0.09);
+    background-color: rgba(255, 255, 255, 0.15);
 }
 
 input:focus {
-    background-color: rgba(255, 255, 255, 0.12);
+    background-color: rgba(255, 255, 255, 0.15);
 }
 
 .nav_buttons {
@@ -106,14 +106,14 @@ article {
 article section {
     display: flex;
     flex-grow: 1;
-    background-color: rgba(255, 255, 255, 0.05);
+    background-color: rgba(255, 255, 255, 0.11);
     flex-direction: column;
     padding: 8px;
 
 }
 
 article section:hover {
-    background-color: rgba(255, 255, 255, 0.09);
+    background-color: rgba(255, 255, 255, 0.15);
 }
 
 a {
@@ -133,13 +133,19 @@ img {
 
 p {
     position: absolute;
+    filter: opacity(0%);
     font-size: 1.17em;
     margin: 4px;
 }
 
 article:hover img{
-    filter: blur(4px) opacity(25%) brightness(0.5);
-    transition-duration: 0.2s;
+    filter: blur(4px) opacity(10%);
+    transition-duration: 0.4s;
+}
+
+article:hover p {
+    filter: opacity(100%);
+    transition-duration: 0.4s;
 }
 
 menu {
@@ -150,13 +156,13 @@ menu {
 button {
     flex-grow: 1;
     flex-basis: 0;
-    background-color: rgba(255, 255, 255, 0.09);
+    background-color: rgba(255, 255, 255, 0.15);
     border: none;
     cursor: pointer;
 }
 
 button:hover {
-    background-color: rgba(255, 255, 255, 0.16);
+    background-color: rgba(255, 255, 255, 0.21);
 }
 
 li {
