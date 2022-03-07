@@ -1,9 +1,8 @@
-import os
 import re
-import requests
-
 from io import BytesIO
 from zipfile import ZipFile
+
+import requests
 
 from config import CONFIG
 from image import image_hash, image_thumbnail, image_dimensions
@@ -21,17 +20,14 @@ class PatreonScrapper(object):
         return name
 
     @staticmethod
-    def create_map(path):
+    def create_map(path, battlemap_hash):
         name, extension = path[:-4], path[-3:]
-        battlemap_hash = image_hash("../" + CONFIG.UPLOAD_DIRECTORY + path)
         image_thumbnail("../" + CONFIG.UPLOAD_DIRECTORY + path, "../" + CONFIG.THUMBNAIL_DIRECTORY + path, extension)
         image_path = CONFIG.UPLOAD_DIRECTORY + path
         thumbnail_path = CONFIG.THUMBNAIL_DIRECTORY + path
         width, height = image_dimensions("../" + CONFIG.UPLOAD_DIRECTORY + path)
         square_width, square_height = width//140, height//140
         name = PatreonScrapper.get_name(name)
-        if Map.query.filter_by(hash=battlemap_hash).first() is not None:
-            return
         battlemap = Map(name=name, extension=extension, hash=battlemap_hash, path=image_path, thumbnail_path=thumbnail_path,
                         width=width, height=height, square_width=square_width, square_height=square_height)
         tags = name.split(" ")
@@ -56,10 +52,12 @@ class PatreonScrapper(object):
                     path = "".join(path.split("_"))
                     path = re.split("([A-Z][a-z]+)", path)
                     path = [word for word in path if len(word) >= 3]
-                    name = " ".join(path[:-1]) + path[-1]
-                    with open("../" + CONFIG.UPLOAD_DIRECTORY + name, "wb") as file:
-                        file.write(download_zip.read(file_name))
-                    PatreonScrapper.create_map(name)
+                    path = " ".join(path[:-1]) + path[-1]
+                    battlemap_hash = image_hash(BytesIO(download_zip.read(file_name)))
+                    if Map.query.filter_by(hash=battlemap_hash).first() is None and Map.query.filter_by(path=CONFIG.UPLOAD_DIRECTORY + path).first() is None:
+                        with open("../" + CONFIG.UPLOAD_DIRECTORY + path, "wb") as file:
+                            file.write(download_zip.read(file_name))
+                        PatreonScrapper.create_map(path, battlemap_hash)
 
     def scrape(self):
         while self.url:
