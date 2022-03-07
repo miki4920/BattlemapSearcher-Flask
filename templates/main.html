@@ -10,11 +10,11 @@
     <nav>
         <form method="get" action="/">
             <label for="tags">Tags: </label>
-            <input type="text" id="tags" name="tags" value="{{ tags }}" autocomplete="off">
+            <input type="text" id="tags" name="tags" value="{{ tags }}" autocomplete="off" placeholder="Search">
             <section class="nav_buttons">
-                <button type="submit">Search</button>
+                <button type="submit" style="display: none">Search</button>
                 {% if previous_page %}
-                <button  type="submit" name="page" value="{{ previous_page }}">Previous</button>
+                <button type="submit" name="page" value="{{ previous_page }}">Previous</button>
                 {% endif %}
                 {% if next_page %}
                 <button type="submit" name="page" value="{{ next_page }}">Next</button>

@@ -7,7 +7,6 @@ function get_map(button, url) {
     temporary_input.select();
     document.execCommand("copy");
     document.body.removeChild(temporary_input);
-
     button.innerText = "Copied";
     setTimeout(function(){ button.innerText="Foundry"; }, 500);
 
