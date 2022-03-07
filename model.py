@@ -1,6 +1,7 @@
 import re
 
 from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy import func
 
 from config import app, CONFIG
 
@@ -49,22 +50,22 @@ class Map(db.Model):
                            backref=db.backref("maps"))
 
 
-def query_maps_by_name(tags):
+def query_maps_by_name(tags, seed):
     tags = [Map.name.contains(tag) for tag in tags]
-    maps = Map.query.filter(*tags)
+    maps = Map.query.filter(*tags).order_by(func.rand(seed))
     return list(maps) if maps is not None else []
 
 
-def query_maps_by_tags(tags):
+def query_maps_by_tags(tags, seed):
     tags = ",".join(tags)
     maps = Map.query.from_statement(db.text(f"""SELECT map_id FROM 
     (SELECT map_id, GROUP_CONCAT(tag_id ORDER BY tag_id) 
-    AS tag_id FROM tags GROUP BY map_id) as t where tag_id LIKE \"%%{tags}%%\" """)).all()
+    AS tag_id FROM tags GROUP BY map_id) as t where tag_id LIKE \"%%{tags}%%\" ORDER BY RAND({seed})""")).all()
     return list(maps) if maps else []
 
 
-def query_maps(tags):
-    maps = query_maps_by_name(tags) + query_maps_by_tags(tags)
+def query_maps(tags, seed):
+    maps = query_maps_by_name(tags, seed) + query_maps_by_tags(tags, seed)
     maps = list(dict.fromkeys(maps))
     return maps
 
