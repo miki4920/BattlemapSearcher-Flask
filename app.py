@@ -1,3 +1,6 @@
+import os
+
+
 from flask import render_template, request, send_from_directory, make_response
 from random import randint
 
@@ -41,6 +44,8 @@ def get_map_image(map_id):
 @app.route("/maps/<map_id>", methods=["DELETE"])
 def delete_map(map_id):
     battlemap = Map.query.filter_by(id=map_id).first_or_404()
+    os.remove(battlemap.path)
+    os.remove(battlemap.thumbnail_path)
     blacklist = BlackListHash(hash=battlemap.hash)
     db.session.add(blacklist)
     db.session.delete(battlemap)
