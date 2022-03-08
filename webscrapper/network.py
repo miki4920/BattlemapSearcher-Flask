@@ -1,3 +1,5 @@
+import socket
+
 import requests
 import time
 
@@ -7,6 +9,9 @@ def get_api_url(subreddit, timestamp):
 
 
 def request_file(url, timeout=0):
-    request = requests.get(url)
+    try:
+        request = requests.get(url)
+    except Exception as e:
+        return None
     time.sleep(timeout)
     return request
