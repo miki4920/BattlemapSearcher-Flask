@@ -94,6 +94,8 @@ def create_map(**kwargs):
                     width=width, height=height, square_width=square_width, square_height=square_height)
     tags = name.split(" ")
     for tag in tags:
+        if len(tag) < CONFIG.MINIMUM_NAME_LENGTH:
+            continue
         query_tag = Tag.query.filter_by(id=tag).first()
         if query_tag is None:
             query_tag = Tag(id=tag)

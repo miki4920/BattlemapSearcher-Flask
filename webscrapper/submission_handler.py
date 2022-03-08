@@ -57,7 +57,7 @@ class SubmissionHandler(object):
         path = name
         count = 2
         while os.path.exists("../" + CONFIG.UPLOAD_DIRECTORY + path + "." + extension):
-            path = name + f"_{count}"
+            path = name + f" {count}"
             count += 1
         return path
 

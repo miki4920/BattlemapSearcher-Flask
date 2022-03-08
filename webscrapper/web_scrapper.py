@@ -12,7 +12,6 @@ class WebScrapper(object):
     def get_submission(self, submission):
         name = submission["title"]
         extension = submission["url"][-3:].lower()
-        print(submission["url"], extension)
         image = request_file(submission["url"], timeout=1)
         if image is None:
             return
