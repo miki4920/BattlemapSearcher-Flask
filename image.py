@@ -1,3 +1,4 @@
+import PIL
 from PIL import Image
 
 
@@ -43,4 +44,7 @@ def image_thumbnail(path, thumbnail_path, extension):
 
 
 def image_dimensions(path):
-    return Image.open(path).size
+    try:
+        return Image.open(path)
+    except PIL.UnidentifiedImageError:
+        return None
