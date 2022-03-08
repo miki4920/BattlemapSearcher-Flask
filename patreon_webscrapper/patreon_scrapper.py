@@ -41,7 +41,7 @@ class PatreonScrapper(object):
                             file.write(download_zip.read(file_name))
                         image_thumbnail("../" + CONFIG.UPLOAD_DIRECTORY + path,
                                         "../" + CONFIG.THUMBNAIL_DIRECTORY + path, extension)
-                        width, height = image_dimensions("../" + CONFIG.UPLOAD_DIRECTORY + path)
+                        width, height = image_dimensions("../" + CONFIG.UPLOAD_DIRECTORY + path).size
                         square_width, square_height = width // 140, height // 140
                         create_map(name=name, extension=extension, path=path, width=width, height=height,
                                    square_width=square_width,
