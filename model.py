@@ -78,3 +78,26 @@ def process_tags(tags):
     tags = re.sub(" +", " ", tags)
     tags = tags.strip(" ")
     return tags.split(" ")
+
+
+def create_map(**kwargs):
+    name = kwargs.get("name")
+    extension = kwargs.get("extension")
+    path = kwargs.get("path")
+    width, height = kwargs.get("width"), kwargs.get("height")
+    square_width, square_height = kwargs.get("square_width"), kwargs.get("square_height")
+    battlemap_hash = kwargs.get("hash")
+    image_path = CONFIG.UPLOAD_DIRECTORY + path
+    thumbnail_path = CONFIG.THUMBNAIL_DIRECTORY + path
+    battlemap = Map(name=name, extension=extension, hash=battlemap_hash, path=image_path,
+                    thumbnail_path=thumbnail_path,
+                    width=width, height=height, square_width=square_width, square_height=square_height)
+    tags = name.split(" ")
+    for tag in tags:
+        query_tag = Tag.query.filter_by(id=tag).first()
+        if query_tag is None:
+            query_tag = Tag(id=tag)
+        if str(query_tag) not in list(map(str, battlemap.tags)):
+            battlemap.tags.append(query_tag)
+    db.session.add(battlemap)
+    db.session.commit()
