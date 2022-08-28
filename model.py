@@ -1,53 +1,57 @@
 import re
 
-from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import func
 
-from config import app, CONFIG
+from config import CONFIG
 
-db = SQLAlchemy(app)
-
-
-tags_table = db.Table('tags', db.Column('tag_id', db.String(CONFIG.MAXIMUM_NAME_LENGTH),
-                                        db.ForeignKey('tag.id'), primary_key=True),
-                      db.Column('map_id', db.Integer,
-                                db.ForeignKey('map.id'), primary_key=True))
+tags_table = CONFIG.db.Table('tags', CONFIG.db.Column('tag_id', CONFIG.db.String(CONFIG.MAXIMUM_NAME_LENGTH),
+                                                      CONFIG.db.ForeignKey('tag.id'), primary_key=True),
+                             CONFIG.db.Column('map_id', CONFIG.db.Integer,
+                                              CONFIG.db.ForeignKey('map.id'), primary_key=True))
 
 
-class Tag(db.Model):
-    id = db.Column(db.String(CONFIG.MAXIMUM_NAME_LENGTH), primary_key=True)
-
-    def __str__(self):
-        return self.id
-
-
-class BlackListHash(db.Model):
-    hash = db.Column(db.String(16), primary_key=True)
+class BlackListHash(CONFIG.db.Model):
+    image_hash = CONFIG.db.Column(CONFIG.db.String(16), primary_key=True)
 
     def __str__(self):
         return self.hash
 
 
-class StopWordList(db.Model):
-    word = db.Column(db.String(CONFIG.MAXIMUM_NAME_LENGTH), primary_key=True)
+class BlackListWord(CONFIG.db.Model):
+    word = CONFIG.db.Column(CONFIG.db.String(CONFIG.MAXIMUM_NAME_LENGTH), primary_key=True)
 
     def __str__(self):
         return self.word
 
 
-class Map(db.Model):
-    id = db.Column(db.INTEGER, primary_key=True)
-    name = db.Column(db.String(CONFIG.MAXIMUM_NAME_LENGTH))
-    extension = db.Column(db.String(3))
-    hash = db.Column(db.String(16), unique=True)
-    path = db.Column(db.String(CONFIG.MAXIMUM_NAME_LENGTH * 10))
-    thumbnail_path = db.Column(db.String(CONFIG.MAXIMUM_NAME_LENGTH * 2))
-    width = db.Column(db.INTEGER)
-    height = db.Column(db.INTEGER)
-    square_width = db.Column(db.INTEGER, nullable=True)
-    square_height = db.Column(db.INTEGER, nullable=True)
-    tags = db.relationship("Tag", secondary=tags_table,
-                           backref=db.backref("maps"))
+class StopWordList(CONFIG.db.Model):
+    word = CONFIG.db.Column(CONFIG.db.String(CONFIG.MAXIMUM_NAME_LENGTH), primary_key=True)
+
+    def __str__(self):
+        return self.word
+
+
+class Tag(CONFIG.db.Model):
+    id = CONFIG.db.Column(CONFIG.db.String(CONFIG.MAXIMUM_NAME_LENGTH), primary_key=True)
+
+    def __str__(self):
+        return self.id
+
+
+class Map(CONFIG.db.Model):
+    id = CONFIG.db.Column(CONFIG.db.INTEGER, primary_key=True)
+    name = CONFIG.db.Column(CONFIG.db.String(CONFIG.MAXIMUM_NAME_LENGTH))
+    extension = CONFIG.db.Column(CONFIG.db.String(4))
+    timestamp = CONFIG.db.Column(CONFIG.db.INTEGER)
+    image_path = CONFIG.db.Column(CONFIG.db.String(CONFIG.MAXIMUM_NAME_LENGTH))
+    image_hash = CONFIG.db.Column(CONFIG.db.String(16), unique=True)
+    thumbnail_path = CONFIG.db.Column(CONFIG.db.String(CONFIG.MAXIMUM_NAME_LENGTH))
+    width = CONFIG.db.Column(CONFIG.db.INTEGER)
+    height = CONFIG.db.Column(CONFIG.db.INTEGER)
+    square_width = CONFIG.db.Column(CONFIG.db.INTEGER, nullable=True)
+    square_height = CONFIG.db.Column(CONFIG.db.INTEGER, nullable=True)
+    tags = CONFIG.db.relationship("Tag", secondary=tags_table,
+                                  backref=CONFIG.db.backref("maps"))
 
 
 def query_maps_by_name(tags, seed):
@@ -58,7 +62,7 @@ def query_maps_by_name(tags, seed):
 
 def query_maps_by_tags(tags, seed):
     tags = ",".join(tags)
-    maps = Map.query.from_statement(db.text(f"""SELECT map_id FROM 
+    maps = Map.query.from_statement(CONFIG.db.text(f"""SELECT map_id FROM 
     (SELECT map_id, GROUP_CONCAT(tag_id ORDER BY tag_id) 
     AS tag_id FROM tags GROUP BY map_id) as t where tag_id LIKE \"%%{tags}%%\" ORDER BY RAND({seed})""")).all()
     return list(maps) if maps else []
@@ -80,19 +84,13 @@ def process_tags(tags):
     return tags.split(" ")
 
 
-def create_map(**kwargs):
-    name = kwargs.get("name")
-    extension = kwargs.get("extension")
-    path = kwargs.get("path")
-    width, height = kwargs.get("width"), kwargs.get("height")
-    square_width, square_height = kwargs.get("square_width"), kwargs.get("square_height")
-    battlemap_hash = kwargs.get("hash")
-    image_path = CONFIG.UPLOAD_DIRECTORY + path
-    thumbnail_path = CONFIG.THUMBNAIL_DIRECTORY + path
-    battlemap = Map(name=name, extension=extension, hash=battlemap_hash, path=image_path,
-                    thumbnail_path=thumbnail_path,
-                    width=width, height=height, square_width=square_width, square_height=square_height)
-    tags = name.split(" ")
+def create_map(post_dictionary, image_path, thumbnail_path):
+    battlemap = Map(name=post_dictionary["name"], extension=post_dictionary["extension"],
+                    timestamp=post_dictionary["timestamp"], image_path=image_path,
+                    image_hash=post_dictionary["image_hash"], thumbnail_path=thumbnail_path,
+                    width=post_dictionary["width"], height=post_dictionary["height"],
+                    square_width=post_dictionary["square_width"], square_height=post_dictionary["square_height"])
+    tags = post_dictionary["name"].split(" ")
     for tag in tags:
         if len(tag) < CONFIG.MINIMUM_NAME_LENGTH:
             continue
@@ -101,5 +99,5 @@ def create_map(**kwargs):
             query_tag = Tag(id=tag)
         if str(query_tag) not in list(map(str, battlemap.tags)):
             battlemap.tags.append(query_tag)
-    db.session.add(battlemap)
-    db.session.commit()
+    CONFIG.db.session.add(battlemap)
+    CONFIG.db.session.commit()
