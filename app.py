@@ -4,11 +4,11 @@ import os
 from flask import render_template, request, send_from_directory, make_response
 from random import randint
 
-from config import CONFIG, app
+from config import CONFIG
 from model import *
 
 
-@app.get("/")
+@CONFIG.app.get("/")
 def main():
     tags = request.args.get("tags", "")
     tags = process_tags(tags)
@@ -25,7 +25,7 @@ def main():
     return response
 
 
-@app.get("/maps/<map_id>")
+@CONFIG.app.get("/maps/<map_id>")
 def get_map(map_id):
     battlemap = Map.query.filter_by(id=map_id).first_or_404()
     battlemap_dictionary = battlemap.__dict__
@@ -34,32 +34,34 @@ def get_map(map_id):
     return battlemap_dictionary
 
 
-@app.get("/maps/<map_id>/download")
+@CONFIG.app.get("/maps/<map_id>/download")
 def get_map_image(map_id):
     battlemap = Map.query.filter_by(id=map_id).first_or_404()
     path = battlemap.name + "." + battlemap.extension
-    return send_from_directory(CONFIG.UPLOAD_DIRECTORY, path=path, as_attachment=True)
+    return send_from_directory(CONFIG.IMAGE_DIRECTORY, path=path, as_attachment=True)
 
 
-@app.route("/maps/<map_id>", methods=["DELETE"])
+@CONFIG.app.route("/maps/<map_id>", methods=["DELETE"])
 def delete_map(map_id):
     battlemap = Map.query.filter_by(id=map_id).first_or_404()
-    os.remove(battlemap.path)
-    os.remove(battlemap.thumbnail_path)
-    blacklist = BlackListHash(hash=battlemap.hash)
-    db.session.add(blacklist)
-    db.session.delete(battlemap)
-    db.session.commit()
+    try:
+        os.remove(battlemap.path)
+        os.remove(battlemap.thumbnail_path)
+    except FileNotFoundError:
+        pass
+    if BlackListHash.query.filter_by(image_hash=battlemap.hash).first() is None:
+        blacklist = BlackListHash(image_hash=battlemap.hash)
+        CONFIG.db.session.add(blacklist)
+    CONFIG.db.session.delete(battlemap)
+    CONFIG.db.session.commit()
     return "Valid", 200
 
 
-@app.after_request
+@CONFIG.app.after_request
 def after_request(response):
     response.headers.add("Access-Control-Allow-Origin", "*")
     return response
 
 
 if __name__ == "__main__":
-    db.create_all()
-    db.session.commit()
-    app.run()
+    CONFIG.app.run()
