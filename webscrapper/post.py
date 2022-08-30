@@ -15,10 +15,11 @@ from webscrapper.image import image_hash
 class Post:
     def __init__(self, submission):
         self.submission = submission
-        self.setters = [self.set_name, self.set_extension, self.set_url, self.set_timestamp, self.set_image, self.set_image_hash, self.set_image_thumbnail, self.set_dimensions, self.set_square_dimensions]
+        self.setters = [self.set_name, self.set_extension, self.set_url, self.set_timestamp, self.set_subreddit, self.set_image, self.set_image_hash, self.set_image_thumbnail, self.set_dimensions, self.set_square_dimensions]
         self.valid = True
         self.name = ""
         self.extension = ""
+        self.subreddit = ""
         self.timestamp = 0
         self.url = ""
         self.image = None
@@ -56,6 +57,9 @@ class Post:
 
     def set_timestamp(self):
         self.timestamp = self.submission["created_utc"]
+
+    def set_subreddit(self):
+        self.subreddit = self.submission["subreddit"]
 
     def set_url(self):
         self.url = self.submission["url"]
@@ -99,6 +103,7 @@ class Post:
         file_name = f"{self.image_hash}.{self.extension}"
         image_path = os.path.join(CONFIG.IMAGE_DIRECTORY, file_name)
         thumbnail_path = os.path.join(CONFIG.THUMBNAIL_DIRECTORY, file_name)
-        create_map(vars(self), image_path, thumbnail_path)
         self.image.save(os.path.join(os.path.dirname(CONFIG.app.instance_path), image_path))
         self.thumbnail.save(os.path.join(os.path.dirname(CONFIG.app.instance_path), thumbnail_path))
+        create_map(vars(self), image_path, thumbnail_path)
+
