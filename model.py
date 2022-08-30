@@ -43,6 +43,7 @@ class Map(CONFIG.db.Model):
     name = CONFIG.db.Column(CONFIG.db.String(CONFIG.MAXIMUM_NAME_LENGTH))
     extension = CONFIG.db.Column(CONFIG.db.String(4))
     timestamp = CONFIG.db.Column(CONFIG.db.INTEGER)
+    subreddit = CONFIG.db.Column(CONFIG.db.String(CONFIG.MAXIMUM_NAME_LENGTH))
     image_path = CONFIG.db.Column(CONFIG.db.String(CONFIG.MAXIMUM_NAME_LENGTH))
     image_hash = CONFIG.db.Column(CONFIG.db.String(16), unique=True)
     thumbnail_path = CONFIG.db.Column(CONFIG.db.String(CONFIG.MAXIMUM_NAME_LENGTH))
@@ -86,7 +87,7 @@ def process_tags(tags):
 
 def create_map(post_dictionary, image_path, thumbnail_path):
     battlemap = Map(name=post_dictionary["name"], extension=post_dictionary["extension"],
-                    timestamp=post_dictionary["timestamp"], image_path=image_path,
+                    timestamp=post_dictionary["timestamp"], subreddit=post_dictionary["subreddit"], image_path=image_path,
                     image_hash=post_dictionary["image_hash"], thumbnail_path=thumbnail_path,
                     width=post_dictionary["width"], height=post_dictionary["height"],
                     square_width=post_dictionary["square_width"], square_height=post_dictionary["square_height"])
