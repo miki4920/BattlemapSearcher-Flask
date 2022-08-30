@@ -5,14 +5,14 @@ from network import get_api_url, request_file
 from post import Post
 
 
-def get_timestamp():
-    newest_map = Map.query.order_by(desc(Map.timestamp)).first()
+def get_timestamp(subreddit):
+    newest_map = Map.query.filter_by(subreddit=subreddit).order_by(desc(Map.timestamp)).first()
     return newest_map.timestamp if newest_map is not None else 0
 
 
 def scrapper():
     for subreddit in CONFIG.SUBREDDITS:
-        timestamp = get_timestamp()
+        timestamp = get_timestamp(subreddit)
         while True:
             url = get_api_url(subreddit, timestamp)
             json_data = request_file(url)
