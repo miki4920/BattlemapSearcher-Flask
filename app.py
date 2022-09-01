@@ -37,7 +37,7 @@ def get_map(map_id):
 @CONFIG.app.get("/maps/<map_id>/download")
 def get_map_image(map_id):
     battlemap = Map.query.filter_by(id=map_id).first_or_404()
-    path = battlemap.name + "." + battlemap.extension
+    path = battlemap.image_hash + "." + battlemap.extension
     return send_from_directory(CONFIG.IMAGE_DIRECTORY, path=path, as_attachment=True)
 
 
