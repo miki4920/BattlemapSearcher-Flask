@@ -45,12 +45,12 @@ def get_map_image(map_id):
 def delete_map(map_id):
     battlemap = Map.query.filter_by(id=map_id).first_or_404()
     try:
-        os.remove(battlemap.path)
+        os.remove(battlemap.image_path)
         os.remove(battlemap.thumbnail_path)
     except FileNotFoundError:
         pass
-    if BlackListHash.query.filter_by(image_hash=battlemap.hash).first() is None:
-        blacklist = BlackListHash(image_hash=battlemap.hash)
+    if BlackListHash.query.filter_by(image_hash=battlemap.image_hash).first() is None:
+        blacklist = BlackListHash(image_hash=battlemap.image_hash)
         CONFIG.db.session.add(blacklist)
     CONFIG.db.session.delete(battlemap)
     CONFIG.db.session.commit()
