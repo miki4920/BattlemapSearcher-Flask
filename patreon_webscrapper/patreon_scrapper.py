@@ -5,8 +5,8 @@ from zipfile import ZipFile
 import requests
 
 from config import CONFIG
-from image import image_hash, image_thumbnail, image_dimensions
-from model import Map, Tag, db, create_map
+from webscrapper.image import image_hash, image_thumbnail, image_dimensions
+from model import Map, create_map
 
 
 class PatreonScrapper(object):
@@ -36,12 +36,12 @@ class PatreonScrapper(object):
                     name = PatreonScrapper.get_name(name)
                     battlemap_hash = image_hash(BytesIO(download_zip.read(file_name)))
                     if Map.query.filter_by(hash=battlemap_hash).first() is None and Map.query.filter_by(
-                            path=CONFIG.UPLOAD_DIRECTORY + path).first() is None:
-                        with open("../" + CONFIG.UPLOAD_DIRECTORY + path, "wb") as file:
+                            path=CONFIG.IMAGE_DIRECTORY + path).first() is None:
+                        with open("../" + CONFIG.IMAGE_DIRECTORY + path, "wb") as file:
                             file.write(download_zip.read(file_name))
-                        image_thumbnail("../" + CONFIG.UPLOAD_DIRECTORY + path,
+                        image_thumbnail("../" + CONFIG.IMAGE_DIRECTORY + path,
                                         "../" + CONFIG.THUMBNAIL_DIRECTORY + path, extension)
-                        width, height = image_dimensions("../" + CONFIG.UPLOAD_DIRECTORY + path).size
+                        width, height = image_dimensions("../" + CONFIG.IMAGE_DIRECTORY + path).size
                         square_width, square_height = width // 140, height // 140
                         create_map(name=name, extension=extension, path=path, width=width, height=height,
                                    square_width=square_width,
