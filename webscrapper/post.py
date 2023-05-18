@@ -15,8 +15,9 @@ from webscrapper.image import image_hash
 class Post:
     def __init__(self, submission):
         self.submission = submission
-        self.setters = [self.set_name, self.set_extension, self.set_url, self.set_timestamp, self.set_subreddit, self.set_image, self.set_image_hash, self.set_image_thumbnail, self.set_dimensions, self.set_square_dimensions]
+        self.setters = [self.set_author, self.set_name, self.set_url, self.set_extension, self.set_timestamp, self.set_subreddit, self.set_image, self.set_image_hash, self.set_image_thumbnail, self.set_dimensions, self.set_square_dimensions]
         self.valid = True
+        self.author = ""
         self.name = ""
         self.extension = ""
         self.subreddit = ""
@@ -34,6 +35,12 @@ class Post:
             setter()
             if not self.valid:
                 break
+
+    def set_author(self):
+        self.author = self.submission.get("author", self.author)
+        if not (CONFIG.MINIMUM_NAME_LENGTH < len(self.author) < CONFIG.MAXIMUM_NAME_LENGTH):
+            self.valid = False
+            return
 
     def set_name(self):
         self.name = self.submission.get("title", self.name)
@@ -63,6 +70,9 @@ class Post:
 
     def set_url(self):
         self.url = self.submission["url"]
+        if not self.url:
+            self.valid = False
+            return
 
     def set_image(self):
         self.image = request_file(self.url, timeout=1)
@@ -103,6 +113,8 @@ class Post:
         file_name = f"{self.image_hash}.{self.extension}"
         image_path = os.path.join(CONFIG.IMAGE_DIRECTORY, file_name)
         thumbnail_path = os.path.join(CONFIG.THUMBNAIL_DIRECTORY, file_name)
+        self.image = self.image.convert("RGB")
+        self.thumbnail = self.thumbnail.convert("RGB")
         self.image.save(os.path.join(os.path.dirname(CONFIG.app.instance_path), image_path))
         self.thumbnail.save(os.path.join(os.path.dirname(CONFIG.app.instance_path), thumbnail_path))
         create_map(vars(self), image_path, thumbnail_path)
