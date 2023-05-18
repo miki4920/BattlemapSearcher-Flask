@@ -15,7 +15,7 @@ def scrapper():
         timestamp = get_timestamp(subreddit)
         while True:
             url = get_api_url(subreddit, timestamp)
-            json_data = request_file(url)
+            json_data = request_file(url, timeout=1)
             if json_data is None:
                 timestamp += 1000
                 continue
