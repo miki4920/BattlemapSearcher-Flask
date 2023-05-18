@@ -70,8 +70,14 @@ def query_maps_by_tags(tags, seed):
     return list(maps) if maps else []
 
 
+def query_maps_by_author(tags, seed):
+    tags = [Map.author.contains(tag) for tag in tags]
+    maps = Map.query.filter(*tags).order_by(func.rand(seed))
+    return list(maps) if maps is not None else []
+
+
 def query_maps(tags, seed):
-    maps = query_maps_by_name(tags, seed) + query_maps_by_tags(tags, seed)
+    maps = query_maps_by_name(tags, seed) + query_maps_by_author(tags, seed) + query_maps_by_tags(tags, seed)
     maps = list(dict.fromkeys(maps))
     return maps
 
