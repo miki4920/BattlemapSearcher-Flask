@@ -26,7 +26,7 @@
         {% for battlemap in maps %}
             <article id="{{ battlemap.id }}">
                 <section>
-                <a href="{{ battlemap.path }}">
+                <a href="{{ battlemap.image_path }}">
                     <p title="Map Information">
                         Title: {{ battlemap.name|replace("_", " ") }}<br>
                         {% if not battlemap.square_width %}
