@@ -29,6 +29,7 @@
                 <a href="{{ battlemap.image_path }}">
                     <p title="Map Information">
                         Title: {{ battlemap.name|replace("_", " ") }}<br>
+                        Author: {{ battlemap.author }}<br>
                         {% if not battlemap.square_width %}
                         Width: {{ battlemap.width }}<br>
                         Height: {{ battlemap.height }}<br>
