@@ -40,6 +40,7 @@ class Tag(CONFIG.db.Model):
 
 class Map(CONFIG.db.Model):
     id = CONFIG.db.Column(CONFIG.db.INTEGER, primary_key=True)
+    author = CONFIG.db.Column(CONFIG.db.String(CONFIG.MAXIMUM_NAME_LENGTH))
     name = CONFIG.db.Column(CONFIG.db.String(CONFIG.MAXIMUM_NAME_LENGTH))
     extension = CONFIG.db.Column(CONFIG.db.String(4))
     timestamp = CONFIG.db.Column(CONFIG.db.INTEGER)
@@ -86,7 +87,7 @@ def process_tags(tags):
 
 
 def create_map(post_dictionary, image_path, thumbnail_path):
-    battlemap = Map(name=post_dictionary["name"], extension=post_dictionary["extension"],
+    battlemap = Map(author=post_dictionary["author"], name=post_dictionary["name"], extension=post_dictionary["extension"],
                     timestamp=post_dictionary["timestamp"], subreddit=post_dictionary["subreddit"], image_path=image_path,
                     image_hash=post_dictionary["image_hash"], thumbnail_path=thumbnail_path,
                     width=post_dictionary["width"], height=post_dictionary["height"],
