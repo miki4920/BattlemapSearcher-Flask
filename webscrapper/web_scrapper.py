@@ -26,7 +26,7 @@ def scrapper():
                 post = Post(post_data)
                 if post.valid:
                     post.save()
-            timestamp = json_data[-1]["created_utc"]
+            timestamp = json_data[-1]["created_utc"] + 1
 
 
 if __name__ == "__main__":
