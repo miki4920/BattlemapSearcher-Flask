@@ -1,3 +1,5 @@
+import json
+
 from sqlalchemy import desc
 
 from model import Map, CONFIG
@@ -19,7 +21,11 @@ def scrapper():
             if json_data is None:
                 timestamp += 1000
                 continue
-            json_data = json_data.json().get("data", [])
+            try:
+                json_data = json_data.json().get("data", [])
+            except json.JSONDecodeError:
+                print("PushshiftAPI is down. You can check it what's happening with it at the following link: ", url)
+                quit()
             if len(json_data) < 1:
                 break
             for post_data in json_data:
