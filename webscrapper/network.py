@@ -17,5 +17,4 @@ def request_file(url, timeout=0):
     except (requests.exceptions.InvalidURL, requests.exceptions.ConnectionError):
         return None
     except Exception as e:
-        print(url)
         raise e

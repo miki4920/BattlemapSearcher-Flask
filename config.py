@@ -27,7 +27,7 @@ class CONFIG:
     Image.MAX_IMAGE_PIXELS = 933120000
     app = Flask(__name__, static_url_path="/" + STATIC_DIRECTORY, static_folder=STATIC_DIRECTORY)
     app.config[
-        'SQLALCHEMY_DATABASE_URI'] = f'mysql://{os.getenv("USERNAME")}:{os.getenv("PASSWORD")}@{os.getenv("IP")}/flask'
+        'SQLALCHEMY_DATABASE_URI'] = f'mysql://{os.getenv("USERNAME")}:{os.getenv("PASSWORD")}@{os.getenv("IP")}/{os.getenv("SCHEMA_NAME")}'
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
     db = SQLAlchemy(app)
 
