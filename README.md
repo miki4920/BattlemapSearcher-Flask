@@ -2,7 +2,7 @@
 
 ## Overview
 
-BattlemapSearcher-Flask is a single page application designed to search for battlemaps. The project is hosted on GitHub and can be found [here](https://github.com/miki4920/BattlemapSearcher-Flask).
+BattlemapSearcher-Flask is a single page application designed to search for battlemaps. 
 
 The project is divided into two main parts:
 
@@ -59,7 +59,7 @@ The following environment variables are required to run the project:
 
 ## Usage
 
-After setting up the project, you can use the website to search for battlemaps. The web scraper will periodically scrape Reddit for new maps according to the specified subreddits.
+After setting up the project, you can use the website to search for battlemaps. The web scraper will periodically scrape Reddit for new maps according to the specified subreddits. Warning, the API used is pushshift.io, which has a tendency to now work.
 
 ## Contributing
 
