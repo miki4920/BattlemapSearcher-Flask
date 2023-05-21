@@ -3,7 +3,7 @@
 ## Overview
 
 BattlemapSearcher-Flask is a single page application designed to search for battlemaps. 
-![BattlemapSearcher-Flask](https://raw.githubusercontent.com/miki4920/BattlemapSearcher-Flas/main/BattlemapsSearcher.gif)
+[BattlemapsSearcher](https://raw.githubusercontent.com/miki4920/BattlemapSearcher-Flask/main/BattlemapsSearcher.gif)
 The project is divided into two main parts:
 
 1. **Web Scraper**: This part of the project is responsible for scraping Reddit according to specified subreddits. The main script for this part is `main.py` located in the `webscrapper` folder.
