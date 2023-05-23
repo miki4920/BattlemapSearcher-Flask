@@ -7,7 +7,7 @@ from random import randint
 from config import CONFIG
 from model import *
 
-
+# TODO:Add ability to implement sliders so that ranges can be considered
 @CONFIG.app.get("/")
 def main():
     tags = request.args.get("tags", "")
