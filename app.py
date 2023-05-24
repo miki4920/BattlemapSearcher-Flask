@@ -7,20 +7,21 @@ from random import randint
 from config import CONFIG
 from model import *
 
-# TODO:Add ability to implement sliders so that ranges can be considered
+
 @CONFIG.app.get("/")
 def main():
-    tags = request.args.get("tags", "")
-    tags = process_tags(tags)
+    get_tags()
+    user_input = request.args.get("user_input", "")
+    user_input = process_tags(user_input)
     page = request.args.get("page", "1")
     page = int(page) if page.isnumeric() else 1
     seed = int(request.cookies.get("seed")) if request.cookies.get("seed") else randint(1, 10000)
-    maps = query_maps(tags, seed) if tags else Map.query.order_by(func.rand(seed)).all()
+    maps = query_maps(user_input, seed) if user_input else Map.query.order_by(func.rand(seed)).all()
     next_page = page + 1 if (page + 1) * CONFIG.MAPS_PER_PAGE <= len(maps) else False
     previous_page = page - 1 if page >= 1 else False
     maps = maps[(page - 1) * CONFIG.MAPS_PER_PAGE:page * CONFIG.MAPS_PER_PAGE]
-    response = make_response(render_template("main.html", maps=maps, tags=request.args.get("tags", ""),
-                                             previous_page=previous_page, next_page=next_page))
+    response = make_response(render_template("main.html", maps=maps, user_input=request.args.get("tags", ""),
+                                             previous_page=previous_page, next_page=next_page, tags=[]))
     response.set_cookie("seed", str(seed))
     return response
 
