@@ -1,6 +1,6 @@
 import re
 
-from sqlalchemy import func
+from sqlalchemy import func, desc
 
 from config import CONFIG
 
@@ -54,6 +54,12 @@ class Map(CONFIG.db.Model):
     square_height = CONFIG.db.Column(CONFIG.db.INTEGER, nullable=True)
     tags = CONFIG.db.relationship("Tag", secondary=tags_table,
                                   backref=CONFIG.db.backref("maps"))
+
+
+def get_tags():
+    tags = CONFIG.db.session.query(tags_table.columns.tag_id, func.count(tags_table.columns.tag_id)).group_by(tags_table.columns.tag_id).order_by(desc(func.count(tags_table.columns.tag_id)), tags_table.columns.tag_id).all()
+    tags = [tag[0] for tag in tags]
+    return tags
 
 
 def query_maps_by_name(tags, seed):
