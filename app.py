@@ -20,7 +20,7 @@ def main():
     next_page = page + 1 if (page + 1) * CONFIG.MAPS_PER_PAGE <= len(maps) else False
     previous_page = page - 1 if page >= 1 else False
     maps = maps[(page - 1) * CONFIG.MAPS_PER_PAGE:page * CONFIG.MAPS_PER_PAGE]
-    response = make_response(render_template("main.html", maps=maps, user_input=request.args.get("tags", ""),
+    response = make_response(render_template("main.html", maps=maps, user_input=request.args.get("user_input", ""),
                                              previous_page=previous_page, next_page=next_page, tags=tags))
     response.set_cookie("seed", str(seed))
     return response
