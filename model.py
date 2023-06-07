@@ -56,34 +56,24 @@ class Map(CONFIG.db.Model):
                                   backref=CONFIG.db.backref("maps"))
 
 
-def get_tags():
-    tags = CONFIG.db.session.query(tags_table.columns.tag_id, func.count(tags_table.columns.tag_id)).group_by(tags_table.columns.tag_id).order_by(desc(func.count(tags_table.columns.tag_id)), tags_table.columns.tag_id).all()
-    tags = [tag[0] for tag in tags]
-    return tags
-
-
-def query_maps_by_name(tags, seed):
+def query_maps_by_name(tags):
     tags = [Map.name.contains(tag) for tag in tags]
-    maps = Map.query.filter(*tags).order_by(func.rand(seed))
+    maps = Map.query.filter(*tags).order_by(desc(Map.timestamp))
     return list(maps) if maps is not None else []
 
 
-def query_maps_by_tags(tags, seed):
+def query_maps_by_tags(tags):
     tags = ",".join(tags)
-    maps = Map.query.from_statement(CONFIG.db.text(f"""SELECT map_id FROM 
-    (SELECT map_id, GROUP_CONCAT(tag_id ORDER BY tag_id) 
-    AS tag_id FROM tags GROUP BY map_id) as t where tag_id LIKE \"%%{tags}%%\" ORDER BY RAND({seed})""")).all()
+    maps = Map.query.from_statement(CONFIG.db.text(f"""SELECT map_id, GROUP_CONCAT(tag_id ORDER BY tag_id) AS tag_id
+     FROM tags t JOIN map m ON t.map_id  = m.id 
+     WHERE tag_id LIKE "%%{tags}%%" GROUP BY map_id ORDER BY m.timestamp DESC;""")).all()
     return list(maps) if maps else []
 
 
-def query_maps_by_author(tags, seed):
-    tags = [Map.author.contains(tag) for tag in tags]
-    maps = Map.query.filter(*tags).order_by(func.rand(seed))
-    return list(maps) if maps is not None else []
-
-
-def query_maps(tags, seed):
-    maps = query_maps_by_name(tags, seed) + query_maps_by_author(tags, seed) + query_maps_by_tags(tags, seed)
+def query_maps(tags):
+    if not tags:
+        return Map.query.order_by(desc(Map.timestamp)).all()
+    maps = query_maps_by_name(tags) + query_maps_by_tags(tags)
     maps = list(dict.fromkeys(maps))
     return maps
 
