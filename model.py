@@ -58,7 +58,7 @@ class Map(CONFIG.db.Model):
 
 
 def query_maps_by_author(tags):
-    tags = [Map.author.contains(author) for author in tags]
+    tags = [Map.author == author for author in tags]
     maps = Map.query.filter(*tags).order_by(desc(Map.timestamp))
     return list(maps) if maps is not None else []
 
@@ -69,8 +69,6 @@ def query_maps_by_tags(tags):
         maps += Map.query.from_statement(CONFIG.db.text(f"""SELECT map_id, GROUP_CONCAT(tag_id ORDER BY tag_id) AS tag_id
          FROM tags t JOIN map m ON t.map_id  = m.id 
          WHERE LOCATE('{tag}', tag_id) GROUP BY map_id ORDER BY m.timestamp DESC;""")).all()
-    counter = Counter(maps)
-    maps = [battlemap for battlemap in maps if counter[battlemap] == len(tags)]
     return list(maps) if maps else []
 
 
@@ -78,6 +76,8 @@ def query_maps(tags):
     if not tags:
         return Map.query.order_by(desc(Map.timestamp)).all()
     maps = query_maps_by_author(tags) + query_maps_by_tags(tags)
+    counter = Counter(maps)
+    maps = sorted(maps, key=counter.get, reverse=True)
     maps = list(dict.fromkeys(maps))
     return maps
 
