@@ -58,7 +58,7 @@ class Map(CONFIG.db.Model):
 
 
 def query_maps_by_author(tags):
-    tags = [Map.author == author for author in tags]
+    tags = [Map.author.contains(author) for author in tags]
     maps = Map.query.filter(*tags).order_by(desc(Map.timestamp))
     return list(maps) if maps is not None else []
 
